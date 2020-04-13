@@ -39,6 +39,6 @@ This library does require an esplicit dependency for phpunit therefore it's up t
 - PHP >= 7.3
 - PhpUnit >= 9
 
-# License
+## License
 
 This library is released under [MIT](LICENSE) license
