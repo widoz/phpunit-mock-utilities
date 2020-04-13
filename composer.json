@@ -34,5 +34,10 @@
     "platform": {
       "php": "7.3"
     }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-develop": "0.1.x-dev"
+    }
   }
 }
