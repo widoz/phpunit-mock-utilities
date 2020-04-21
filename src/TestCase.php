@@ -57,7 +57,6 @@ class TestCase extends PHPUnitTestCase
         array $constructorArguments,
         array $methods
     ): MockBuilder {
-        /** @var MockBuilder $mockBuilder */
         $mockBuilder = parent::getMockBuilder($className);
 
         $constructorArguments
