@@ -46,6 +46,7 @@ final class ProxyTest extends TestCase
     public function testMethodsOfProxiedObjectAreAccessible(): void
     {
         $toBeProxied = new ToBeProxied();
+        /** @var ToBeProxied $proxy */
         $proxy = new Proxy($toBeProxied);
 
         parent::assertEquals('publicMethod', $proxy->publicMethod());
@@ -58,6 +59,7 @@ final class ProxyTest extends TestCase
      */
     public function testStaticMethodsOfProxiedClassAreAccessible(): void
     {
+        /** @var ToBeProxied $proxy */
         $proxy = new Proxy(ToBeProxied::class);
 
         parent::assertEquals('publicStaticMethod', $proxy->publicStaticMethod());
@@ -71,6 +73,7 @@ final class ProxyTest extends TestCase
     public function testCanAccessToProxiedProperties(): void
     {
         $toBeProxied = new ToBeProxied();
+        /** @var ToBeProxied $proxy */
         $proxy = new Proxy($toBeProxied);
 
         parent::assertEquals('publicProperty', $proxy->publicProperty);
@@ -96,6 +99,7 @@ final class ProxyTest extends TestCase
     public function testCanSetPropertiesOnProxiedProperty(): void
     {
         $toBeProxied = new ToBeProxied();
+        /** @var ToBeProxied $proxy */
         $proxy = new Proxy($toBeProxied);
 
         parent::assertEquals('publicProperty', $proxy->publicProperty);
