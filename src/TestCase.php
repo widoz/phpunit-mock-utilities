@@ -64,7 +64,10 @@ class TestCase extends PHPUnitTestCase
             : $mockBuilder->disableOriginalConstructor();
 
         $methodsName = self::isAssociativeArray($methods) ? array_keys($methods) : $methods;
-        $methods and $mockBuilder->onlyMethods($methodsName);
+
+        if ($methods) {
+            $mockBuilder->onlyMethods($methodsName);
+        }
 
         return $mockBuilder;
     }
@@ -82,18 +85,20 @@ class TestCase extends PHPUnitTestCase
      * @throws RuntimeException
      * @return MockObject
      */
-    private static function buildMock(
-        string $className,
-        MockBuilder $mockBuilder
-    ): MockObject {
+    private static function buildMock(string $className, MockBuilder $mockBuilder): MockObject
+    {
         $mock = null;
         $reflection = new ReflectionClass($className);
 
         if ($reflection->isAbstract() || $reflection->isInterface()) {
             $mock = $mockBuilder->getMockForAbstractClass();
         }
-        $reflection->isTrait() and $mock = $mockBuilder->getMockForTrait();
-        $mock or $mock = $mockBuilder->getMock();
+        if ($reflection->isTrait()) {
+            $mock = $mockBuilder->getMockForTrait();
+        }
+        if (!$mock) {
+            $mock = $mockBuilder->getMock();
+        }
 
         return $mock;
     }
