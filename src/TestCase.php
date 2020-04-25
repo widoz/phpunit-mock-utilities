@@ -38,7 +38,9 @@ class TestCase extends PHPUnitTestCase
         $mockBuilder = $this->createMockBuilder($className, $constructorArguments, $methods);
         $mock = $this->buildMock($className, $mockBuilder);
 
-        self::isAssociativeArray($methods) and self::configureMock($mock, $methods);
+        if (self::isAssociativeArray($methods)) {
+            self::configureMock($mock, $methods);
+        }
 
         return $mock;
     }
@@ -90,7 +92,7 @@ class TestCase extends PHPUnitTestCase
         $mock = null;
         $reflection = new ReflectionClass($className);
 
-        if ($reflection->isAbstract() || $reflection->isInterface()) {
+        if (!$reflection->isTrait() && ($reflection->isAbstract() || $reflection->isInterface())) {
             $mock = $mockBuilder->getMockForAbstractClass();
         }
         if ($reflection->isTrait()) {

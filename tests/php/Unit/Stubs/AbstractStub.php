@@ -10,8 +10,8 @@ abstract class AbstractStub
 
     abstract protected function abstractProtectedMethod();
 
-    private function privateMethod(...$params)
+    private function privateMethod()
     {
-        return $params;
+        return __METHOD__;
     }
 }

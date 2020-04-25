@@ -10,7 +10,9 @@ use Widoz\PhpUnit\Mock\Utilities\Faker;
 use Widoz\PhpUnit\Mock\Utilities\Proxy;
 use Widoz\PhpUnit\Mock\Utilities\TestCase;
 use Widoz\PhpUnit\Mock\Utilities\Tests\Unit\Stubs\AbstractStub;
-use Widoz\PhpUnit\Mock\Utilities\Tests\Unit\Stubs\ToBeTested;
+use Widoz\PhpUnit\Mock\Utilities\Tests\Unit\Stubs\ClassStub;
+
+use Widoz\PhpUnit\Mock\Utilities\Tests\Unit\Stubs\TraitStub;
 
 use function array_intersect;
 
@@ -21,33 +23,54 @@ final class TestCaseTest extends TestCase
 {
     /**
      * Can create a mock with properties and methods
+     * Assert it's possible to call a mocked method
      */
     public function testMock(): void
     {
-        $property = Faker::faker()->uuid;
-        $constructorArguments = [$property];
+        $methods = ['methodForMock'];
+        $mock = parent::mock(ClassStub::class, [], $methods);
 
-        $returnValueOfMockedMethod = Faker::faker()->uuid;
-        $methods = [
-            'methodForMock' => parent::returnCallback(
-                function () use ($returnValueOfMockedMethod): string {
-                    return $returnValueOfMockedMethod;
-                }
-            ),
+        self::assertMethodsExists($mock, ...$methods);
+    }
+
+    /**
+     * Test mock for Abstract classes
+     */
+    public function testMockForAbstractClasses(): void
+    {
+        $methodsToMock = [
+            'abstractPublicMethod',
+            'abstractProtectedMethod',
+            'privateMethod',
         ];
-
-        /** @var TestCase $testCase */
-        $testCase = new Proxy(new TestCase());
-        $mock = $testCase->mock(
-            ToBeTested::class,
-            $constructorArguments,
-            $methods
+        $mock = parent::mock(
+            AbstractStub::class,
+            [],
+            $methodsToMock
         );
 
-        $mockedValueResult = $mock->methodForMock();
+        parent::assertInstanceOf(MockObject::class, $mock);
+        parent::assertInstanceOf(AbstractStub::class, $mock);
+        self::assertMethodsExists($mock, ...$methodsToMock);
+    }
 
-        parent::assertEquals($property, $mock->property());
-        parent::assertEquals($mockedValueResult, $returnValueOfMockedMethod);
+    public function testMockForTrait(): void
+    {
+        $methodsToMock = [
+            'publicTraitMethod',
+            'protectedTraitMethod',
+            'privateTraitMethod',
+            'abstractPublicTraitMethod',
+            'abstractProtectedTraitMethod',
+        ];
+        $mock = parent::mock(
+            TraitStub::class,
+            [],
+            $methodsToMock
+        );
+
+        parent::assertInstanceOf(MockObject::class, $mock);
+        self::assertMethodsExists($mock, ...$methodsToMock);
     }
 
     /**
@@ -62,7 +85,7 @@ final class TestCaseTest extends TestCase
         /** @var TestCase $proxy */
         $proxy = new Proxy(new TestCase());
         $mockBuilder = $proxy->createMockBuilder(
-            ToBeTested::class,
+            ClassStub::class,
             $constructorArguments,
             $methods
         );
@@ -80,7 +103,7 @@ final class TestCaseTest extends TestCase
         /** @var TestCase $proxy */
         $proxy = new Proxy(new TestCase());
         $mockBuilder = $proxy->createMockBuilder(
-            ToBeTested::class,
+            ClassStub::class,
             [],
             []
         );
@@ -100,7 +123,7 @@ final class TestCaseTest extends TestCase
         /** @var TestCase $proxy */
         $proxy = new Proxy(new TestCase());
         $mockBuilder = $proxy->createMockBuilder(
-            ToBeTested::class,
+            ClassStub::class,
             [],
             $methods
         );
@@ -110,27 +133,7 @@ final class TestCaseTest extends TestCase
         parent::assertEquals($methods, $proxyMockBuilder->methods);
     }
 
-    /**
-     * Test createMockBuilder for Abstract classes
-     */
-    public function testCreateMockBuilderForAbstractClasses(): void
-    {
-        $methodsToMock = [
-            'abstractPublicMethod',
-            'abstractProtectedMethod',
-        ];
-        $mock = parent::mock(
-            AbstractStub::class,
-            [],
-            $methodsToMock
-        );
-
-        parent::assertInstanceOf(MockObject::class, $mock);
-        parent::assertInstanceOf(AbstractStub::class, $mock);
-        self::assertMethodsExists($mock, ...$methodsToMock);
-    }
-
-    private function assertMethodsExists(object $object, string ...$methodNames): void
+    private static function assertMethodsExists(object $object, string ...$methodNames): void
     {
         $reflection = new ReflectionClass($object);
         $methods = $reflection->getMethods();
@@ -138,6 +141,7 @@ final class TestCaseTest extends TestCase
         foreach ($methods as &$method) {
             $method = $method->getName();
         }
+        unset($method);
 
         $intersection = array_intersect($methodNames, $methods);
         parent::assertEquals($methodNames, $intersection);
