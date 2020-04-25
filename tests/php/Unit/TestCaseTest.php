@@ -54,6 +54,9 @@ final class TestCaseTest extends TestCase
         self::assertMethodsExists($mock, ...$methodsToMock);
     }
 
+    /**
+     * Test mock can be created for trait
+     */
     public function testMockForTrait(): void
     {
         $methodsToMock = [
