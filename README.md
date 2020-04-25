@@ -19,7 +19,7 @@ For that reason I found my self writing again and again the same portions of cod
 This little utility library has been realized with that intent, make a bit more easier to create a mock/stub without taking care of
 unnecessary details when those details are not needed to be known.
 
-This library does not have the presuntion not the goal to be another mocking library for your unit tests, if you need something which
+This library does not have the presumption not the goal to be another mocking library for your unit tests, if you need something which
 boost PhpUnit mock feature there are a lot of libraries out there :)
 
 ## Features
