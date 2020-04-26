@@ -34,9 +34,12 @@ class TestCase extends PHPUnitTestCase
     final protected function mock(
         string $className,
         array $constructorArguments,
-        array $methods
+        array $methods,
+        callable $configureMock = null
     ): MockObject {
         $mockBuilder = $this->createMockBuilder($className, $constructorArguments, $methods);
+        $configureMock and $configureMock($mockBuilder);
+
         $mock = $this->buildMock($className, $mockBuilder);
 
         if (self::isAssociativeArray($methods)) {

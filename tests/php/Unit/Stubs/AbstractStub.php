@@ -12,6 +12,6 @@ abstract class AbstractStub
 
     private function privateMethod()
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 }

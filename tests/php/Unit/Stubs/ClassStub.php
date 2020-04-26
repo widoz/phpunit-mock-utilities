@@ -11,7 +11,7 @@ class ClassStub
      */
     private $property;
 
-    public function __construct(string $property)
+    public function __construct(string $property = '')
     {
         $this->property = $property;
     }
@@ -23,7 +23,7 @@ class ClassStub
 
     public function publicMethod(): string
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 
     public function publicMethodCallProtectedMethod(): string
@@ -33,11 +33,11 @@ class ClassStub
 
     protected function protectedMethod(): string
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 
     private function privateMethod(): string
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 }

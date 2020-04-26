@@ -7,6 +7,7 @@ namespace Widoz\PhpUnit\Mock\Utilities\Tests\Unit;
 use Faker\Factory;
 use Faker\Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use Widoz\PhpUnit\Mock\Utilities\Faker;
@@ -210,6 +211,31 @@ final class TestCaseTest extends TestCase
         parent::assertEquals($expectedResult, $result);
     }
 
+    /**
+     * Test the mock builder can configure before the mock is created
+     */
+    public function testMockBuilderAllowExtraConfigurationBeforeTheMockIsCreated(): void
+    {
+        /** @var ClassStub $mock */
+        $mock = parent::mock(
+            ClassStub::class,
+            [],
+            [],
+            function (MockBuilder $mockBuilder) {
+                $mockBuilder
+                    ->enableOriginalConstructor()
+                    ->enableProxyingToOriginalMethods();
+            }
+        );
+
+        $result = $mock->publicMethod();
+
+        parent::assertEquals('publicMethod', $result);
+    }
+
+    /**
+     * Assert a method exists in the given object
+     */
     private static function assertMethodsExists(object $object, string ...$methodNames): void
     {
         $reflection = new ReflectionClass($object);

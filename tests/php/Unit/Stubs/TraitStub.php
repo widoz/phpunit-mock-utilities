@@ -8,17 +8,17 @@ trait TraitStub
 {
     public function publicTraitMethod()
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 
     protected function protectedTraitMethod()
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 
     private function privateTraitMethod()
     {
-        return __METHOD__;
+        return __FUNCTION__;
     }
 
     abstract public function abstractPublicTraitMethod();
