@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Widoz\PhpUnit\Mock\Utilities\Tests\Unit\Stubs;
 
-final class ToBeProxied
+final class ProxyStub
 {
     public static $publicStaticProperty = 'publicStaticProperty';
 

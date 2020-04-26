@@ -8,14 +8,15 @@ use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\RuntimeException;
+use PHPUnit\Framework\MockObject\Stub\Stub;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use ReflectionClass;
 use ReflectionException;
 
+use function is_callable;
+
 /**
  * Phpunit Test Case
- *
- * TODO The Faker should probably be in a separated class, may be a function?
  */
 class TestCase extends PHPUnitTestCase
 {
@@ -124,10 +125,27 @@ class TestCase extends PHPUnitTestCase
      */
     private static function configureMock(MockObject $mockObject, array $methods): void
     {
-        // TODO May automatically check for type and use `parent::return*` methods automatically?
         foreach ($methods as $methodName => $return) {
-            $mockObject->method($methodName)->will($return);
+            $mockObject->method($methodName)->will(self::createReturnType($return));
         }
+    }
+
+    /**
+     * @param $return
+     *
+     * @return mixed
+     */
+    private static function createReturnType($return)
+    {
+        if ($return instanceof Stub) {
+            return $return;
+        }
+
+        if (is_callable($return)) {
+            return parent::returnCallback($return);
+        }
+
+        return parent::returnValue($return);
     }
 
     /**

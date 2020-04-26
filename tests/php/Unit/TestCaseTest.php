@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Widoz\PhpUnit\Mock\Utilities\Tests\Unit;
 
+use Faker\Factory;
+use Faker\Generator;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use Widoz\PhpUnit\Mock\Utilities\Faker;
@@ -27,7 +30,7 @@ final class TestCaseTest extends TestCase
      */
     public function testMock(): void
     {
-        $methods = ['methodForMock'];
+        $methods = ['publicMethod'];
         $mock = parent::mock(ClassStub::class, [], $methods);
 
         self::assertMethodsExists($mock, ...$methods);
@@ -83,7 +86,7 @@ final class TestCaseTest extends TestCase
     {
         $property = Faker::faker()->uuid;
         $constructorArguments = [$property];
-        $methods = ['methodForMock'];
+        $methods = ['publicMethod'];
 
         /** @var TestCase $proxy */
         $proxy = new Proxy(new TestCase());
@@ -136,6 +139,77 @@ final class TestCaseTest extends TestCase
         parent::assertEquals($methods, $proxyMockBuilder->methods);
     }
 
+    /**
+     * Test will return automatically use `returnCallback`
+     */
+    public function testWillReturnCallback(): void
+    {
+        $argument = self::faker()->uuid;
+
+        /** @var ClassStub $mock */
+        $mock = parent::mock(
+            ClassStub::class,
+            [],
+            [
+                'publicMethod' => function ($argument) {
+                    return $argument;
+                },
+                'protectedMethod' => function () use ($argument) {
+                    return $argument;
+                },
+            ]
+        );
+
+        $result = $mock->publicMethod($argument);
+        parent::assertEquals($argument, $result);
+
+        $result = $mock->publicMethodCallProtectedMethod();
+        parent::assertEquals($argument, $result);
+    }
+
+    /**
+     * Test will return automatically use `returnValue`
+     */
+    public function testWillReturnValue(): void
+    {
+        $argument = self::faker()->uuid;
+
+        /** @var ClassStub $mock */
+        $mock = parent::mock(
+            ClassStub::class,
+            [],
+            [
+                'publicMethod' => $argument,
+                'protectedMethod' => $argument,
+            ]
+        );
+
+        $result = $mock->publicMethod();
+        parent::assertEquals($argument, $result);
+
+        $result = $mock->publicMethodCallProtectedMethod();
+        parent::assertEquals($argument, $result);
+    }
+
+    /**
+     * Test return value not wrapped if already a stub
+     */
+    public function testValueNotWrappedTwiceIfAlreadyAStub(): void
+    {
+        $expectedResult = self::faker()->uuid;
+        /** @var ClassStub $mock */
+        $mock = parent::mock(
+            ClassStub::class,
+            [],
+            [
+                'publicMethod' => parent::returnValue($expectedResult),
+            ]
+        );
+
+        $result = $mock->publicMethod();
+        parent::assertEquals($expectedResult, $result);
+    }
+
     private static function assertMethodsExists(object $object, string ...$methodNames): void
     {
         $reflection = new ReflectionClass($object);
@@ -148,5 +222,23 @@ final class TestCaseTest extends TestCase
 
         $intersection = array_intersect($methodNames, $methods);
         parent::assertEquals($methodNames, $intersection);
+    }
+
+    /**
+     * Create a faker generator
+     *
+     * @throws InvalidArgumentException
+     * @return Generator
+     */
+    private static function faker(): Generator
+    {
+        static $generator = null;
+
+        if (!$generator) {
+            $factory = new Factory();
+            $generator = $factory->create();
+        }
+
+        return $generator;
     }
 }

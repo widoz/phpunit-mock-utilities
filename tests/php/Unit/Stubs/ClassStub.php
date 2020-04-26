@@ -21,13 +21,23 @@ class ClassStub
         return $this->property;
     }
 
-    public function methodForMock(): string
+    public function publicMethod(): string
     {
         return __METHOD__;
     }
 
-    public function neverMockedMethod(): string
+    public function publicMethodCallProtectedMethod(): string
     {
-        return __FUNCTION__;
+        return $this->protectedMethod();
+    }
+
+    protected function protectedMethod(): string
+    {
+        return __METHOD__;
+    }
+
+    private function privateMethod(): string
+    {
+        return __METHOD__;
     }
 }
