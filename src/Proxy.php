@@ -61,9 +61,8 @@ final class Proxy
      * @param mixed $value
      *
      * @throws ReflectionException
-     * @return $this
      */
-    public function __set(string $key, $value): self
+    public function __set(string $key, $value): void
     {
         $property = new ReflectionProperty($this->class, $key);
 
@@ -74,8 +73,6 @@ final class Proxy
         $property->isStatic()
             ? $property->setValue($value)
             : $property->setValue($this->object, $value);
-
-        return $this;
     }
 
     /**
